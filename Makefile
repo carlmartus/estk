@@ -1,5 +1,5 @@
 CC=clang
-LDFLAGS=-lSDL -lGL -lGLEW
+LDFLAGS=-lSDL -lGL -lGLEW -lm
 EMCC=/opt/emscripten/emcc
 DEMOS=$(wildcard demo_*.c)
 PROGS=$(DEMOS:%.c=%)

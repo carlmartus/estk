@@ -2,6 +2,7 @@
 #include "estk.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <GL/glew.h>
@@ -93,9 +94,16 @@ int
 esShaderLoad(esShader *shader, const char *vert_file, const char *frag_file)
 {
 	int idvert = shader_load(vert_file, GL_VERTEX_SHADER);
-	if (idvert == 0) return 1;
+	if (idvert == 0) {
+		printf("Invalid vertex shader file (%s)\n", vert_file);
+		return 1;
+	}
+
 	int idfrag = shader_load(frag_file, GL_FRAGMENT_SHADER);
-	if (idfrag == 0) return 1;
+	if (idfrag == 0) {
+		printf("Invalid fragment shader file (%s)\n", frag_file);
+		return 1;
+	}
 
 	int program = glCreateProgram();
 
@@ -232,6 +240,38 @@ esGeoRender(const esGeo *geo, int vertices)
 
 	for (i=0; i<bufcount; i++) glDisableVertexAttribArray(i);
 	check_error();
+}
+
+// }}}
+// Projection {{{
+
+#define P0 (0.0f)
+#define P1 (1.0f)
+
+void
+esProjIdentity(float *mat)
+{
+	mat[ 0]=P1; mat[ 1]=P0; mat[ 2]=P0; mat[ 3]=P0;
+	mat[ 4]=P0; mat[ 5]=P1; mat[ 6]=P0; mat[ 7]=P0;
+	mat[ 8]=P0; mat[ 9]=P0; mat[10]=P1; mat[11]=P0;
+	mat[12]=P0; mat[13]=P0; mat[14]=P0; mat[15]=P1;
+}
+
+void
+esProjPerspective(
+		float *mat, float fov, float screenratio, float near, float far)
+{
+	float deltaz = far - near;
+	float sine = sinf(fov);
+	float cotangent = cosf(fov) / sine;
+
+	esProjIdentity(mat);
+	mat[ 0] = cotangent / screenratio;
+	mat[ 5] = cotangent;
+	mat[10] = -(far + near) / deltaz;
+	mat[11] = -1.0f;
+	mat[14] = -2.0f * near * far / deltaz;
+	mat[15] = 0.0f;
 }
 
 // }}}

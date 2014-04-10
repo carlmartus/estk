@@ -65,5 +65,13 @@ void esGeoPoint(esGeo *geo, int id, esGeoBuf *geobuf, enum esGeoDataType datatyp
 		int elements, size_t offset, size_t stride, enum esBool normalized);
 void esGeoRender(const esGeo *geo, int vertices);
 
+// Projection
+typedef struct { float x, y, z; } esVec3;
+
+void esProjIdentity(float *mat);
+void esProjPerspective(
+		float *mat, float fov, float screenratio, float near, float far);
+void esProjMul(float *res, float *a, float *b);
+
 #endif
 
