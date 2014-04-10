@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <GL/glew.h>
 
+#include <SDL/SDL_image.h>
+
 static void
 _check_error(int line)
 {
@@ -272,6 +274,134 @@ esProjPerspective(
 	mat[11] = -1.0f;
 	mat[14] = -2.0f * near * far / deltaz;
 	mat[15] = 0.0f;
+}
+
+
+static esVec3
+cross(esVec3 a, esVec3 b)
+{
+	return (esVec3) {
+		a.y*b.z - a.z*b.y,
+		a.z*b.x - a.x*b.z,
+		a.x*b.y - a.y*b.x,
+	};
+}
+
+static void
+normalize(esVec3 *v)
+{
+    float r;
+
+    r = sqrtf(v->x*v->x + v->y*v->y + v->z*v->z);
+    if (r == 0.0f) return;
+
+    v->x /= r;
+    v->y /= r;
+    v->z /= r;
+}
+
+void
+esProjLookAt(float *mat, esVec3 eye, esVec3 at, esVec3 up)
+{
+	esVec3 forw = {
+		at.x - eye.x,
+		at.y - eye.y,
+		at.z - eye.z,
+	};
+
+	normalize(&forw);
+	esVec3 side = cross(forw, up);
+	normalize(&side);
+
+	up = cross(forw, side);
+
+	mat[0] = side.x;
+	mat[1] = side.y;
+	mat[2] = side.z;
+
+	mat[4] = up.x;
+	mat[5] = up.y;
+	mat[6] = up.z;
+
+	mat[ 8] = -forw.x;
+	mat[ 9] = -forw.y;
+	mat[10] = -forw.z;
+
+	mat[ 3] = -eye.x;
+	mat[ 7] = -eye.y;
+	mat[11] = -eye.z;
+
+	mat[12] = 0.0f;
+	mat[13] = 0.0f;
+	mat[14] = 0.0f;
+	mat[15] = 1.0f;
+}
+
+void
+esProjMul(float *res, float *a, float *b)
+{
+	int x, y, i=0;
+	for (y=0; y<4; y++) {
+		for (x=0; x<4; x++) {
+
+			int r = y<<2;
+			res[i] =
+				a[r+ 0]*b[x+ 0] +
+				a[r+ 1]*b[x+ 4] +
+				a[r+ 2]*b[x+ 8] +
+				a[r+ 3]*b[x+12];
+
+			i++;
+		}
+	}
+}
+
+// }}}
+// Texture {{{
+
+int
+esTextureLoad(esTexture *tex, const char *file_name,
+		enum esTextureMipmap min, enum esTextureMipmap mag)
+{
+	SDL_Surface *surf = IMG_Load(file_name);
+	if (surf == NULL) return 1;
+
+	tex->w = surf->w;
+	tex->h = surf->h;
+
+	GLuint gltex;
+	glGenTextures(1, &gltex);
+	tex->gltexture = gltex;
+	glBindTexture(GL_TEXTURE_2D, tex->gltexture);
+
+	int mode = surf->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
+
+	glTexImage2D(GL_TEXTURE_2D, 0, mode, surf->w, surf->h,
+			0, mode, GL_UNSIGNED_BYTE, surf->pixels);
+
+	static const GLenum map[] = {
+		[TEX_NONE] = GL_NEAREST,
+		[TEX_LINEAR] = GL_LINEAR,
+	};
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, map[min]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, map[mag]);
+
+	SDL_FreeSurface(surf);
+	return 0;
+}
+
+void
+esTextureUse(esTexture *tex)
+{
+	glBindTexture(GL_TEXTURE_2D, tex->gltexture);
+}
+
+void
+esTextureUnload(esTexture *tex)
+{
+	GLuint gltex = tex->gltexture;
+	glDeleteTextures(1, &gltex);
 }
 
 // }}}

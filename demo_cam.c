@@ -23,9 +23,9 @@ main()
 	}
 
 	static const float lo[] = {
-		0.0f, 0.0f,-1.0f,
-		1.0f, 0.0f,-1.0f,
-		0.0f, 1.0f,-1.0f,
+		0.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
 	};
 
 	esGeoBuf geobuf;
@@ -41,9 +41,15 @@ main()
 
 	esShaderUse(&shad);
 
-	float mat[16];
-	//esProjIdentity(mat);
-	esProjPerspective(mat, 1.0f, 1.333f, 0.1f, 10.0f);
+	float mat[16], persp[16], look[16];
+	esProjPerspective(persp, 1.0f, 1.333f, 0.1f, 20.0f);
+
+	esVec3 cam_ey = { -2.0f, -2.0f, 5.0f };
+	esVec3 cam_at = { 0.0f, 0.0f, 0.0f };
+	esVec3 cam_up = { 0.0f, 0.0f, 1.0f };
+	esProjLookAt(look, cam_ey, cam_at, cam_up);
+
+	esProjMul(mat, persp, look);
 	glUniformMatrix4fv(esShaderUniformGl(&shad, 0), 1, 0, mat);
 
 	esGeoRender(&geo, 3);
