@@ -183,3 +183,74 @@ Near field
  * *param 5* **float** *far*  
 Far field
 
+esProjLookAt
+------------
+
+Positions the camera
+
+ * *param 1* **float[16]** *mat*  
+Destination to put matrix
+
+ * *param 2* **esVec3** *eye*  
+Position of camera
+
+ * *param 3* **esVec3** *at*  
+Target of camera
+
+ * *param 4* **esVec3** *up*  
+Up vector
+
+esProjMul
+---------
+
+Multiplies two matrices
+
+ * *param 1* **float[16]** *res*  
+Result of multiplication
+
+ * *param 2* **float[16]** *a*  
+First matrix
+
+ * *param 3* **float[16]** *b*  
+Second matrix
+
+Texture
+=======
+
+Texture loading. Demo in demo_image
+
+esTextureLoad
+-------------
+
+Load a texture from file
+
+ * *param 1* **esTexture*** *tex*  
+self
+
+ * *param 2* **const char*** *file_name*  
+Path to image file
+
+ * *param 3* **enum esTextureMipmap** *min*  
+Minification filter
+
+ * *param 4* **enum esTextureMipmap** *mag*  
+Magnification filter
+
+**return** *int* 0 for success
+
+esTextureUse
+------------
+
+Bind a texture
+
+ * *param 1* **esTexture*** *tex*  
+self
+
+esTextureUnload
+---------------
+
+Delete a texture
+
+ * *param 1* **esTexture*** *tex*  
+self
+
