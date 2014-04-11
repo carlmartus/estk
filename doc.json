@@ -86,9 +86,13 @@
 	"Projection" : {
 		"desc" : "Tools for generating opengl compatible 4x4 float matrices. Demo in demo_cam and demo_mainloop",
 
-		"func:esProjIdentity" : {
-			"desc" : "Procude a identity matrix",
-			"param:float[16]:mat" : "Destination to put matrix"
+		"func:esProjOrtho" : {
+			"desc" : "Procude a 2D orthogonal matrix",
+			"param:float[16]:mat" : "Destination to put matrix",
+			"param:float:x0" : "Right border",
+			"param:float:y0" : "Top border",
+			"param:float:x1" : "Left border",
+			"param:float:y1" : "Bottom border"
 		},
 
 		"func:esProjPerspective" : {

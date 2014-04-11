@@ -72,7 +72,7 @@ void esGeoRender(const esGeo *geo, int vertices);
 // Projection
 typedef struct { float x, y, z; } esVec3;
 
-void esProjIdentity(float *mat);
+void esProjOrtho(float *mat, float x0, float y0, float x1, float y1);
 void esProjPerspective(
 		float *mat, float fov, float screenratio, float near, float far,
 		esVec3 eye, esVec3 at, esVec3 up);

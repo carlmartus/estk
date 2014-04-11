@@ -41,12 +41,9 @@ main(int argc, char **argv)
 
 	esShaderUse(&shad);
 
-	esVec3 cam_ey = { -1.0f, -1.0f, 1.0f };
-	esVec3 cam_at = { 0.0f, 0.0f, 0.0f };
-	esVec3 cam_up = { 0.0f, 0.0f, 1.0f };
-
 	float mat[16];
-	esProjPerspective(mat, 1.3f, 1.333f, 0.1f, 20.0f, cam_ey, cam_at, cam_up);
+	//esProjPerspective(mat, 1.3f, 1.333f, 0.1f, 20.0f, cam_ey, cam_at, cam_up);
+	esProjOrtho(mat, 0.0f, 0.0f, 4.0f, 3.0f);
 	glUniformMatrix4fv(esShaderUniformGl(&shad, 0), 1, 0, mat);
 
 	esGeoRender(&geo, 3);
