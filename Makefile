@@ -1,4 +1,3 @@
-CC=clang
 LDFLAGS=-lSDL -lGL -lGLEW -lm -lSDL_image
 EMCC=/opt/emscripten/emcc
 DEMOS=$(wildcard demo_*.c)

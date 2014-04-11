@@ -2,12 +2,14 @@
 #define ESTK_H
 #include <stdlib.h>
 
-#define GEOBUFS_MAX 8
-
 enum esBool {
 	ES_FALSE = 0,
 	ES_TRUE = 1,
 };
+
+// Game loop
+void esGameLoop(void (*frame)(float t), int frame_rate);
+void esGameLoopQuit();
 
 // Shader
 typedef int esUniform;
@@ -25,6 +27,8 @@ int esShaderUniformRegister(esShader *shader, esUniform reg, const char *name);
 int esShaderUniformGl(esShader *shader, esUniform reg);
 
 // Geometry buffer
+#define GEOBUFS_MAX 8
+
 enum esGeoBufType {
 	GEOBUF_STATIC,
 	GEOBUF_DYNAMIC,

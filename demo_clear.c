@@ -3,7 +3,7 @@
 #include <GL/gl.h>
 
 int
-main()
+main(int argc, char **argv)
 {
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_SetVideoMode(400, 300, 0, SDL_OPENGL);

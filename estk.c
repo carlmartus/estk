@@ -6,6 +6,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <GL/glew.h>
+#ifdef EMSCRIPTEN
+#include <emscripten/emscripten.h>
+#endif
 
 #include <SDL/SDL_image.h>
 
@@ -29,6 +32,49 @@ _check_error(int line)
 	}
 }
 #define check_error() _check_error(__LINE__)
+
+// }}}
+// Game loop {{{
+static int loop_run;
+
+#ifdef EMSCRIPTEN
+static float emscripten_frame_time;
+static void (*emscripten_frame)(float t);
+
+static void
+emscripten_mainloop()
+{
+}
+
+#endif
+
+void
+esGameLoop(void (*frame)(float t), int frame_rate)
+{
+	loop_run = 1;
+
+#ifdef EMSCRIPTEN
+	emscripten_frame = frame;
+	emscripten_frame_time = 1.0f / (float) frame_rate;
+
+	emscripten_set_main_loop(emscripten_mainloop, frame_rate, 0);
+#else
+
+	if (frame_rate == 0) frame_rate = 60;
+	int loop_delay = 1000 / frame_rate;
+
+	while (loop_run) {
+		frame(0.1f);
+		SDL_Delay(loop_delay);
+	}
+#endif
+}
+
+void
+esGameLoopQuit()
+{
+	loop_run = 0;
+}
 
 // }}}
 // File {{{
@@ -56,7 +102,7 @@ file_alloc(const char *file_name)
 // Shader {{{
 
 static int
-check_shader(GLuint id)
+check_shader(GLuint id, const char *shader_info)
 {
 	GLint result = GL_FALSE;
 
@@ -65,7 +111,7 @@ check_shader(GLuint id)
 	if (result != GL_TRUE) {
 		char info_buf[500];
 		glGetShaderInfoLog(id, sizeof(info_buf)-1, NULL, info_buf);
-		printf("Shader info:\n%s\n", info_buf);
+		printf("Shader info (%s):\n%s\n", shader_info, info_buf);
 		check_error();
 		return 1;
 	}
@@ -74,7 +120,7 @@ check_shader(GLuint id)
 }
 
 int
-shader_load(const char *file_name, GLenum shader_type)
+shader_load(const char *file_name, GLenum shader_type, const char *shader_info)
 {
 	char *content = file_alloc(file_name);
 	if (content == NULL) {
@@ -87,7 +133,7 @@ shader_load(const char *file_name, GLenum shader_type)
 	check_error();
 	free(content);
 
-	if (check_shader(shad)) return 0;
+	if (check_shader(shad, shader_info)) return 0;
 
 	return shad;
 }
@@ -95,13 +141,13 @@ shader_load(const char *file_name, GLenum shader_type)
 int
 esShaderLoad(esShader *shader, const char *vert_file, const char *frag_file)
 {
-	int idvert = shader_load(vert_file, GL_VERTEX_SHADER);
+	int idvert = shader_load(vert_file, GL_VERTEX_SHADER, "Vertex shader");
 	if (idvert == 0) {
 		printf("Invalid vertex shader file (%s)\n", vert_file);
 		return 1;
 	}
 
-	int idfrag = shader_load(frag_file, GL_FRAGMENT_SHADER);
+	int idfrag = shader_load(frag_file, GL_FRAGMENT_SHADER, "Fragment shader");
 	if (idfrag == 0) {
 		printf("Invalid fragment shader file (%s)\n", frag_file);
 		return 1;
@@ -253,10 +299,16 @@ esGeoRender(const esGeo *geo, int vertices)
 void
 esProjIdentity(float *mat)
 {
+	/*
 	mat[ 0]=P1; mat[ 1]=P0; mat[ 2]=P0; mat[ 3]=P0;
 	mat[ 4]=P0; mat[ 5]=P1; mat[ 6]=P0; mat[ 7]=P0;
 	mat[ 8]=P0; mat[ 9]=P0; mat[10]=P1; mat[11]=P0;
-	mat[12]=P0; mat[13]=P0; mat[14]=P0; mat[15]=P1;
+	mat[12]=P0; mat[13]=P0; mat[14]=P0; mat[15]=P1;*/
+
+	mat[ 0]=P1; mat[ 4]=P0; mat[ 8]=P0; mat[12]=P0;
+	mat[ 1]=P0; mat[ 5]=P1; mat[ 9]=P0; mat[13]=P0;
+	mat[ 2]=P0; mat[ 6]=P0; mat[10]=P1; mat[14]=P0;
+	mat[ 3]=P0; mat[ 7]=P0; mat[11]=P0; mat[15]=P1;
 }
 
 void
@@ -268,11 +320,20 @@ esProjPerspective(
 	float cotangent = cosf(fov) / sine;
 
 	esProjIdentity(mat);
+
+	/*
 	mat[ 0] = cotangent / screenratio;
 	mat[ 5] = cotangent;
 	mat[10] = -(far + near) / deltaz;
 	mat[11] = -1.0f;
 	mat[14] = -2.0f * near * far / deltaz;
+	mat[15] = 0.0f;*/
+
+	mat[ 0] = cotangent / screenratio;
+	mat[ 5] = cotangent;
+	mat[10] = -(far + near) / deltaz;
+	mat[14] = -1.0f;
+	mat[11] = -2.0f * near * far / deltaz;
 	mat[15] = 0.0f;
 }
 
@@ -313,7 +374,25 @@ esProjLookAt(float *mat, esVec3 eye, esVec3 at, esVec3 up)
 	esVec3 side = cross(forw, up);
 	normalize(&side);
 
-	up = cross(forw, side);
+	up = cross(side, forw);
+	esProjIdentity(mat);
+
+	mat[ 0] = side.x;
+	mat[ 4] = side.y;
+	mat[ 8] = side.z;
+
+	mat[ 1] = up.x;
+	mat[ 5] = up.y;
+	mat[ 9] = up.z;
+
+	mat[ 2] = -forw.x;
+	mat[ 6] = -forw.y;
+	mat[10] = -forw.z;
+
+	/*
+	mat[12] = -eye.x;
+	mat[13] = -eye.y;
+	mat[14] = -eye.z;
 
 	mat[0] = side.x;
 	mat[1] = side.y;
@@ -325,7 +404,7 @@ esProjLookAt(float *mat, esVec3 eye, esVec3 at, esVec3 up)
 
 	mat[ 8] = -forw.x;
 	mat[ 9] = -forw.y;
-	mat[10] = -forw.z;
+	mat[10] = -forw.z;*/
 
 	mat[ 3] = -eye.x;
 	mat[ 7] = -eye.y;
