@@ -166,7 +166,7 @@ Destination to put matrix
 esProjPerspective
 -----------------
 
-Procude a perspective matrix
+Procude a 3D perspective matrix
 
  * *param 1* **float[16]** *mat*  
 Destination to put matrix
@@ -183,36 +183,14 @@ Near field
  * *param 5* **float** *far*  
 Far field
 
-esProjLookAt
-------------
-
-Positions the camera
-
- * *param 1* **float[16]** *mat*  
-Destination to put matrix
-
- * *param 2* **esVec3** *eye*  
+ * *param 6* **esVec3** *eye*  
 Position of camera
 
- * *param 3* **esVec3** *at*  
+ * *param 7* **esVec3** *at*  
 Target of camera
 
- * *param 4* **esVec3** *up*  
+ * *param 8* **esVec3** *up*  
 Up vector
-
-esProjMul
----------
-
-Multiplies two matrices
-
- * *param 1* **float[16]** *res*  
-Result of multiplication
-
- * *param 2* **float[16]** *a*  
-First matrix
-
- * *param 3* **float[16]** *b*  
-Second matrix
 
 Texture
 =======

@@ -1,0 +1,130 @@
+{
+	"Shaders" : {
+		"desc" : "GLSL shaders. For demo check out demo_shadercomp or demo_uniform",
+
+		"func:esShaderLoad" : {
+			"desc" : "Create a shader program from two shader files",
+			"param:esShader*:shader" : "self",
+			"param:const char*:vert_file" : "Vertex shader file path",
+			"param:const char*:frag_file" : "Fragment shader file path",
+			"return:int" : "0 for success"
+		},
+
+		"func:esShaderUse" : {
+			"desc" : "Activate a shader to use",
+			"param:esShader*:shader" : "self"
+		},
+
+		"func:esShaderUnload" : {
+			"desc" : "Free a shader",
+			"param:esShader*:shader" : "self"
+		},
+
+		"func:esShaderUniformRegister" : {
+			"desc" : "Register an uniform constant. You register an uniform to a register specified in the parameter **reg**",
+			"param:esShader*:shader" : "self",
+			"param:esUniform:reg" : "Register to put the uniform location in (Max 10 registered constants",
+			"param:const char*:name" : "Name of the uniform in the GLSL shader",
+			"return:int" : "0 for success"
+		},
+
+		"func:esShaderUniformGl" : {
+			"desc" : "Getting the OpenGL location of a registered uniform"
+		}
+	},
+
+	"Geometry buffers" : {
+		"desc" : "OpenGL vertex arrays. For a demo of geometry check out demo_red or demo_stride",
+
+		"func:esGeoBufCreate" : {
+			"desc" : "Generate a vertex buffer",
+			"param:esGeoBuf:buf" : "self"
+		},
+
+		"func:esGeoBufCopy" : {
+			"desc" : "Copy vertex data into buffer",
+			"param:esGeoBuf:buf" : "self",
+			"param:const void*:data" : "Pointer to vertex data",
+			"param:size_t:size" : "Total size of vertex data",
+			"param:enum esGeoBufType:type" : "Type of persistance of buffer data. Read about glBufferData to get a betteer understanding"
+		},
+
+		"func:esGeoBufDelete" : {
+			"desc" : "Free a buffer",
+			"param:esGeoBuf:buf" : "self"
+		}
+	},
+
+	"Geometry" : {
+		"desc" : "Check out demo_red or demo_stride",
+
+		"func:esGeoReset" : {
+			"desc" : "Resets a geometry structure",
+			"param:esGeo:geo" : "self",
+			"param:int:bufcount" : "Amount of vertex pointer count"
+		},
+
+		"func:esGeoPoint" : {
+			"desc" : "Wrapper for glVertexPointer. Settings for a GLSL attribute",
+			"param:esGeo:geo" : "self",
+			"param:int:id" : "Attribute buffer id",
+			"param:esGeoBuf*:geobuf" : "Buffer structure which the pointer will be using",
+			"param:enum esGeoDataType:datatype" : "Datatype of data",
+			"param:int:elements" : "Amount of data elements",
+			"param:size_t:offset" : "Offset to data if it's in a unpacked datastructure",
+			"param:size_t:stride" : "Size of unpacket datastructure",
+			"param:enum esBool:normalized" : "Will the data be within -1.0 to 1.0 in GLSL?"
+		},
+
+		"func:esGeoRender" : {
+			"desc" : "Render geometry",
+			"param:esGeo:geo" : "self",
+			"param:int:vertices" : "Amount of vertices to render"
+		}
+	},
+
+	"Projection" : {
+		"desc" : "Tools for generating opengl compatible 4x4 float matrices. Demo in demo_cam and demo_mainloop",
+
+		"func:esProjIdentity" : {
+			"desc" : "Procude a identity matrix",
+			"param:float[16]:mat" : "Destination to put matrix"
+		},
+
+		"func:esProjPerspective" : {
+			"desc" : "Procude a 3D perspective matrix",
+			"param:float[16]:mat" : "Destination to put matrix",
+			"param:float:fov" : "Field of view (radianses)",
+			"param:float:screenratio" : "Ratio of screen (width / height)",
+			"param:float:near" : "Near field",
+			"param:float:far" : "Far field",
+			"param:esVec3:eye" : "Position of camera",
+			"param:esVec3:at" : "Target of camera",
+			"param:esVec3:up" : "Up vector"
+		}
+	},
+
+	"Texture" : {
+		"desc" : "Texture loading. Demo in demo_image",
+
+		"func:esTextureLoad" : {
+			"desc" : "Load a texture from file",
+			"param:esTexture*:tex" : "self",
+			"param:const char*:file_name" : "Path to image file",
+			"param:enum esTextureMipmap:min" : "Minification filter",
+			"param:enum esTextureMipmap:mag" : "Magnification filter",
+			"return:int" : "0 for success"
+		},
+
+		"func:esTextureUse" : {
+			"desc" : "Bind a texture",
+			"param:esTexture*:tex" : "self"
+		},
+
+		"func:esTextureUnload" : {
+			"desc" : "Delete a texture",
+			"param:esTexture*:tex" : "self"
+		}
+	}
+}
+
