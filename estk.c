@@ -396,10 +396,10 @@ lookat_matrix(float *mat, esVec3 eye, esVec3 at, esVec3 up)
 	};
 
 	normalize(&forw);
-	esVec3 side = cross(forw, up);
+	esVec3 side = cross(up, forw);
 	normalize(&side);
 
-	up = cross(side, forw);
+	up = cross(forw, side);
 
 	float m0[16];
 	identity_matrix(m0);
@@ -418,17 +418,12 @@ lookat_matrix(float *mat, esVec3 eye, esVec3 at, esVec3 up)
 
 	float m1[16];
 	identity_matrix(m1);
-	/*
-	m1[12] = -dot(side, eye);
-	m1[13] = -dot(up, eye);
-	m1[14] = -dot(forw, eye);
-	identity_matrix(m1);*/
 
 	m1[12] = -eye.x;
 	m1[13] = -eye.y;
 	m1[14] = -eye.z;
 
-	mul_matrix(mat, m0, m1);
+	mul_matrix(mat, m1, m0);
 }
 
 void
@@ -438,13 +433,11 @@ esProjPerspective(
 {
 	float persp[16];
 	perspective_matrix(persp, fov, screenratio, near, far);
-	//perspective_matrix(mat, fov, screenratio, near, far);
 
 	float look[16];
 	lookat_matrix(look, eye, at, up);
-	lookat_matrix(mat, eye, at, up);
 
-	//mul_matrix(mat, look, persp);
+	mul_matrix(mat, look, persp);
 }
 
 // }}}
