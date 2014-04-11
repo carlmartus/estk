@@ -308,18 +308,31 @@ identity_matrix(float *mat)
 static void
 perspective_matrix(float *mat, float fov, float screenratio, float near, float far)
 {
-	float deltaz = far - near;
-	float sine = sinf(fov);
-	float cotangent = cosf(fov) / sine;
+	float size = near * tanf(fov * 0.5); 
+	float left = -size;
+	float right = size;
+	float bottom = -size / screenratio;
+	float top = size / screenratio;
 
-	identity_matrix(mat);
+	mat[0] = 2 * near / (right - left);
+	mat[1] = 0.0;
+	mat[2] = 0.0;
+	mat[3] = 0.0;
 
-	mat[ 0] = cotangent / screenratio;
-	mat[ 5] = cotangent;
-	mat[10] = -(far + near) / deltaz;
-	mat[11] = -1.0f;
-	mat[14] = -2.0f * near * far / deltaz;
-	mat[15] = 0.0f;
+	mat[4] = 0.0;
+	mat[5] = 2 * near / (top - bottom);
+	mat[6] = 0.0;
+	mat[7] = 0.0;
+
+	mat[8] = (right + left) / (right - left);
+	mat[9] = (top + bottom) / (top - bottom);
+	mat[10] = -(far + near) / (far - near);
+	mat[11] = -1;
+
+	mat[12] = 0.0;
+	mat[13] = 0.0;
+	mat[14] = -(2 * far * near) / (far - near);
+	mat[15] = 0.0;
 }
 
 
@@ -347,34 +360,12 @@ normalize(esVec3 *v)
     v->z *= r;
 }
 
-void
-lookat_matrix(float *mat, esVec3 eye, esVec3 at, esVec3 up)
+/*
+static float
+dot(esVec3 a, esVec3 b)
 {
-	esVec3 forw = {
-		at.x - eye.x,
-		at.y - eye.y,
-		at.z - eye.z,
-	};
-
-	normalize(&forw);
-	esVec3 side = cross(forw, up);
-	normalize(&side);
-
-	up = cross(side, forw);
-	identity_matrix(mat);
-
-	mat[ 0] = side.x;
-	mat[ 4] = side.y;
-	mat[ 8] = side.z;
-
-	mat[ 1] = up.x;
-	mat[ 5] = up.y;
-	mat[ 9] = up.z;
-
-	mat[ 2] = -forw.x;
-	mat[ 6] = -forw.y;
-	mat[10] = -forw.z;
-}
+	return a.x*b.x + a.y*b.y + a.z*b.z;
+}*/
 
 void
 mul_matrix(float *res, float *a, float *b)
@@ -396,23 +387,64 @@ mul_matrix(float *res, float *a, float *b)
 }
 
 void
+lookat_matrix(float *mat, esVec3 eye, esVec3 at, esVec3 up)
+{
+	esVec3 forw = {
+		at.x - eye.x,
+		at.y - eye.y,
+		at.z - eye.z,
+	};
+
+	normalize(&forw);
+	esVec3 side = cross(forw, up);
+	normalize(&side);
+
+	up = cross(side, forw);
+
+	float m0[16];
+	identity_matrix(m0);
+
+	m0[ 0] = side.x;
+	m0[ 4] = side.y;
+	m0[ 8] = side.z;
+
+	m0[ 1] = up.x;
+	m0[ 5] = up.y;
+	m0[ 9] = up.z;
+
+	m0[ 2] = -forw.x;
+	m0[ 6] = -forw.y;
+	m0[10] = -forw.z;
+
+	float m1[16];
+	identity_matrix(m1);
+	/*
+	m1[12] = -dot(side, eye);
+	m1[13] = -dot(up, eye);
+	m1[14] = -dot(forw, eye);
+	identity_matrix(m1);*/
+
+	m1[12] = -eye.x;
+	m1[13] = -eye.y;
+	m1[14] = -eye.z;
+
+	mul_matrix(mat, m0, m1);
+}
+
+void
 esProjPerspective(
 		float *mat, float fov, float screenratio, float near, float far,
 		esVec3 eye, esVec3 at, esVec3 up)
 {
 	float persp[16];
-	//perspective_matrix(persp, fov, screenratio, near, far);
-	identity_matrix(persp);
+	perspective_matrix(persp, fov, screenratio, near, far);
+	//perspective_matrix(mat, fov, screenratio, near, far);
 
 	float look[16];
 	lookat_matrix(look, eye, at, up);
 	//lookat_matrix(mat, eye, at, up);
 
-	mul_matrix(mat, persp, look);
-
-	mat[ 3] = -eye.x;
-	mat[ 7] = -eye.y;
-	mat[11] = -eye.z;
+	mul_matrix(mat, look, persp);
 }
 
 // }}}
