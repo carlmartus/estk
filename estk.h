@@ -74,9 +74,8 @@ typedef struct { float x, y, z; } esVec3;
 
 void esProjIdentity(float *mat);
 void esProjPerspective(
-		float *mat, float fov, float screenratio, float near, float far);
-void esProjLookAt(float *mat, esVec3 eye, esVec3 at, esVec3 up);
-void esProjMul(float *res, float *a, float *b);
+		float *mat, float fov, float screenratio, float near, float far,
+		esVec3 eye, esVec3 at, esVec3 up);
 
 // Texture
 enum esTextureMipmap {

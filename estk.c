@@ -297,7 +297,7 @@ esGeoRender(const esGeo *geo, int vertices)
 #define P1 (1.0f)
 
 void
-esProjIdentity(float *mat)
+identity_matrix(float *mat)
 {
 	mat[ 0]=P1; mat[ 4]=P0; mat[ 8]=P0; mat[12]=P0;
 	mat[ 1]=P0; mat[ 5]=P1; mat[ 9]=P0; mat[13]=P0;
@@ -305,21 +305,20 @@ esProjIdentity(float *mat)
 	mat[ 3]=P0; mat[ 7]=P0; mat[11]=P0; mat[15]=P1;
 }
 
-void
-esProjPerspective(
-		float *mat, float fov, float screenratio, float near, float far)
+static void
+perspective_matrix(float *mat, float fov, float screenratio, float near, float far)
 {
 	float deltaz = far - near;
 	float sine = sinf(fov);
 	float cotangent = cosf(fov) / sine;
 
-	esProjIdentity(mat);
+	identity_matrix(mat);
 
 	mat[ 0] = cotangent / screenratio;
 	mat[ 5] = cotangent;
 	mat[10] = -(far + near) / deltaz;
-	mat[14] = -1.0f;
-	mat[11] = -2.0f * near * far / deltaz;
+	mat[11] = -1.0f;
+	mat[14] = -2.0f * near * far / deltaz;
 	mat[15] = 0.0f;
 }
 
@@ -349,7 +348,7 @@ normalize(esVec3 *v)
 }
 
 void
-esProjLookAt(float *mat, esVec3 eye, esVec3 at, esVec3 up)
+lookat_matrix(float *mat, esVec3 eye, esVec3 at, esVec3 up)
 {
 	esVec3 forw = {
 		at.x - eye.x,
@@ -362,7 +361,7 @@ esProjLookAt(float *mat, esVec3 eye, esVec3 at, esVec3 up)
 	normalize(&side);
 
 	up = cross(side, forw);
-	esProjIdentity(mat);
+	identity_matrix(mat);
 
 	mat[ 0] = side.x;
 	mat[ 4] = side.y;
@@ -375,14 +374,10 @@ esProjLookAt(float *mat, esVec3 eye, esVec3 at, esVec3 up)
 	mat[ 2] = -forw.x;
 	mat[ 6] = -forw.y;
 	mat[10] = -forw.z;
-
-	mat[ 3] = -eye.x;
-	mat[ 7] = -eye.y;
-	mat[11] = -eye.z;
 }
 
 void
-esProjMul(float *res, float *a, float *b)
+mul_matrix(float *res, float *a, float *b)
 {
 	int x, y, i=0;
 	for (y=0; y<4; y++) {
@@ -398,6 +393,26 @@ esProjMul(float *res, float *a, float *b)
 			i++;
 		}
 	}
+}
+
+void
+esProjPerspective(
+		float *mat, float fov, float screenratio, float near, float far,
+		esVec3 eye, esVec3 at, esVec3 up)
+{
+	float persp[16];
+	//perspective_matrix(persp, fov, screenratio, near, far);
+	identity_matrix(persp);
+
+	float look[16];
+	lookat_matrix(look, eye, at, up);
+	//lookat_matrix(mat, eye, at, up);
+
+	mul_matrix(mat, persp, look);
+
+	mat[ 3] = -eye.x;
+	mat[ 7] = -eye.y;
+	mat[11] = -eye.z;
 }
 
 // }}}

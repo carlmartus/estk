@@ -17,17 +17,21 @@ frame(float time)
 
 	esShaderUse(&shad);
 
-	float mat[16], persp[16], look[16];
-
-	esProjPerspective(persp, 1.3f, 1.333f, 0.1f, 20.0f);
+	//float mat[16], persp[16], look[16];
+	//esProjPerspective(persp, 1.3f, 1.333f, 0.1f, 20.0f);
 
 	float v = 0.05f * (float) frame_count;
-	esVec3 cam_ey = {-1.0f, v, 1.0f };
+	//esVec3 cam_ey = {-1.0f, v, 1.0f };
+	esVec3 cam_ey = { 2.0f*cosf(v), 2.0f*sinf(v), 2.0f };
 	esVec3 cam_at = { 0.0f, 0.0f, 0.0f };
 	esVec3 cam_up = { 0.0f, 0.0f, 1.0f };
-	esProjLookAt(look, cam_ey, cam_at, cam_up);
 
-	esProjMul(mat, persp, look);
+	/*
+	esProjLookAt(look, cam_ey, cam_at, cam_up);
+	esProjMul(mat, persp, look);*/
+
+	float mat[16];
+	esProjPerspective(mat, 1.3f, 1.333f, 0.1f, 20.0f, cam_ey, cam_at, cam_up);
 
 	glUniformMatrix4fv(esShaderUniformGl(&shad, 0), 1, 0, mat);
 
