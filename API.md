@@ -153,15 +153,27 @@ Amount of vertices to render
 Projection
 ==========
 
-Tools for generating opengl compatible 4x4 float matrices. Demo in demo_cam
+Tools for generating opengl compatible 4x4 float matrices. Demo in demo_cam and demo_mainloop
 
-esProjIdentity
---------------
+esProjOrtho
+-----------
 
-Procude a identity matrix
+Procude a 2D orthogonal matrix
 
  * *param 1* **float[16]** *mat*  
 Destination to put matrix
+
+ * *param 2* **float** *x0*  
+Right border
+
+ * *param 3* **float** *y0*  
+Top border
+
+ * *param 4* **float** *x1*  
+Left border
+
+ * *param 5* **float** *y1*  
+Bottom border
 
 esProjPerspective
 -----------------
