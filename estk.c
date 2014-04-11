@@ -356,9 +356,10 @@ normalize(esVec3 *v)
     r = sqrtf(v->x*v->x + v->y*v->y + v->z*v->z);
     if (r == 0.0f) return;
 
-    v->x /= r;
-    v->y /= r;
-    v->z /= r;
+	r = 1.0f / r;
+    v->x *= r;
+    v->y *= r;
+    v->z *= r;
 }
 
 void
