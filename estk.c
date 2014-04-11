@@ -299,12 +299,6 @@ esGeoRender(const esGeo *geo, int vertices)
 void
 esProjIdentity(float *mat)
 {
-	/*
-	mat[ 0]=P1; mat[ 1]=P0; mat[ 2]=P0; mat[ 3]=P0;
-	mat[ 4]=P0; mat[ 5]=P1; mat[ 6]=P0; mat[ 7]=P0;
-	mat[ 8]=P0; mat[ 9]=P0; mat[10]=P1; mat[11]=P0;
-	mat[12]=P0; mat[13]=P0; mat[14]=P0; mat[15]=P1;*/
-
 	mat[ 0]=P1; mat[ 4]=P0; mat[ 8]=P0; mat[12]=P0;
 	mat[ 1]=P0; mat[ 5]=P1; mat[ 9]=P0; mat[13]=P0;
 	mat[ 2]=P0; mat[ 6]=P0; mat[10]=P1; mat[14]=P0;
@@ -320,14 +314,6 @@ esProjPerspective(
 	float cotangent = cosf(fov) / sine;
 
 	esProjIdentity(mat);
-
-	/*
-	mat[ 0] = cotangent / screenratio;
-	mat[ 5] = cotangent;
-	mat[10] = -(far + near) / deltaz;
-	mat[11] = -1.0f;
-	mat[14] = -2.0f * near * far / deltaz;
-	mat[15] = 0.0f;*/
 
 	mat[ 0] = cotangent / screenratio;
 	mat[ 5] = cotangent;
@@ -390,31 +376,9 @@ esProjLookAt(float *mat, esVec3 eye, esVec3 at, esVec3 up)
 	mat[ 6] = -forw.y;
 	mat[10] = -forw.z;
 
-	/*
-	mat[12] = -eye.x;
-	mat[13] = -eye.y;
-	mat[14] = -eye.z;
-
-	mat[0] = side.x;
-	mat[1] = side.y;
-	mat[2] = side.z;
-
-	mat[4] = up.x;
-	mat[5] = up.y;
-	mat[6] = up.z;
-
-	mat[ 8] = -forw.x;
-	mat[ 9] = -forw.y;
-	mat[10] = -forw.z;*/
-
 	mat[ 3] = -eye.x;
 	mat[ 7] = -eye.y;
 	mat[11] = -eye.z;
-
-	mat[12] = 0.0f;
-	mat[13] = 0.0f;
-	mat[14] = 0.0f;
-	mat[15] = 1.0f;
 }
 
 void
