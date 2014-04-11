@@ -442,9 +442,9 @@ esProjPerspective(
 
 	float look[16];
 	lookat_matrix(look, eye, at, up);
-	//lookat_matrix(mat, eye, at, up);
+	lookat_matrix(mat, eye, at, up);
 
-	mul_matrix(mat, look, persp);
+	//mul_matrix(mat, look, persp);
 }
 
 // }}}
