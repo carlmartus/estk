@@ -34,6 +34,15 @@ frame(float time)
 	if (++frame_count > 100) esGameLoopQuit();
 }
 
+static void
+loop_exit()
+{
+	esGeoBufDelete(&geobuf);
+	esShaderUnload(&shad);
+
+	SDL_Quit();
+}
+
 int
 main(int argc, char **argv)
 {
@@ -66,12 +75,7 @@ main(int argc, char **argv)
 
 	glClearColor(0.6, 0.5, 0.6, 1.0);
 
-	esGameLoop(frame, 0);
-
-	esGeoBufDelete(&geobuf);
-	esShaderUnload(&shad);
-
-	SDL_Quit();
+	esGameLoop(frame, loop_exit, 0);
 	return 0;
 }
 

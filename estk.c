@@ -40,21 +40,28 @@ static int loop_run;
 #ifdef EMSCRIPTEN
 static float emscripten_frame_time;
 static void (*emscripten_frame)(float t);
+static void (*emscripten_exit)();
 
 static void
 emscripten_mainloop()
 {
+	if (!loop_run) {
+		emscripten_cancel_main_loop();
+	} else {
+		emscripten_frame(0.1f);
+	}
 }
 
 #endif
 
 void
-esGameLoop(void (*frame)(float t), int frame_rate)
+esGameLoop(void (*frame)(float t), void (*exit) (), int frame_rate)
 {
 	loop_run = 1;
 
 #ifdef EMSCRIPTEN
 	emscripten_frame = frame;
+	emscripten_exit = exit;
 	emscripten_frame_time = 1.0f / (float) frame_rate;
 
 	emscripten_set_main_loop(emscripten_mainloop, frame_rate, 0);
