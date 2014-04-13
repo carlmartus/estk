@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <GL/glew.h>
+#include <SDL/SDL.h>
 #ifdef EMSCRIPTEN
 #include <emscripten/emscripten.h>
 #endif
@@ -35,6 +36,22 @@ _check_error(int line)
 
 // }}}
 // Game loop {{{
+
+void
+esGameInit(int screen_width, int screen_height)
+{
+	SDL_Init(SDL_INIT_VIDEO);
+	SDL_SetVideoMode(400, 300, 0, SDL_OPENGL);
+
+	glewInit();
+}
+
+void
+esGameGlSwap()
+{
+	SDL_GL_SwapBuffers();
+}
+
 static int loop_run;
 
 #ifdef EMSCRIPTEN
@@ -46,7 +63,7 @@ static void
 emscripten_mainloop()
 {
 	if (!loop_run) {
-		emscripten_exit();
+		if (emscripten_exit) emscripten_exit();
 		emscripten_cancel_main_loop();
 		return;
 	}
@@ -94,7 +111,7 @@ esGameLoop(void (*frame)(float t), void (*exit)(), int frame_rate)
 		start = SDL_GetTicks();
 	}
 
-	exit();
+	if (exit) exit();
 #endif
 }
 

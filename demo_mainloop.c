@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <SDL/SDL.h>
 #include <GL/glew.h>
 #include <math.h>
+#include <SDL/SDL.h>
 #include "estk.h"
 
 static esShader shad;
@@ -31,7 +31,7 @@ frame(float time)
 
 	esGeoRender(&geo, 3);
 
-	SDL_GL_SwapBuffers();
+	esGameGlSwap();
 
 	if (++frame_count > 100) esGameLoopQuit();
 }
@@ -48,10 +48,7 @@ loop_exit()
 int
 main(int argc, char **argv)
 {
-	SDL_Init(SDL_INIT_VIDEO);
-	SDL_SetVideoMode(400, 300, 0, SDL_OPENGL);
-
-	glewInit();
+	esGameInit(400, 300);
 
 	if (esShaderLoad(&shad, "demores/cam_vert.shader", "demores/red_frag.shader")) {
 		printf("Cannot load shaders!\n");

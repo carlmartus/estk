@@ -6,10 +6,7 @@
 int
 main(int argc, char **argv)
 {
-	SDL_Init(SDL_INIT_VIDEO);
-	SDL_SetVideoMode(400, 300, 0, SDL_OPENGL);
-
-	glewInit();
+	esGameInit(400, 300);
 
 	esShader shad;
 	if (esShaderLoad(&shad, "demores/attr_vert.shader", "demores/attr_frag.shader")) {
@@ -41,8 +38,7 @@ main(int argc, char **argv)
 	esShaderUse(&shad);
 	esGeoRender(&geo, 3);
 
-	SDL_GL_SwapBuffers();
-
+	esGameGlSwap();
 
 	esGeoBufDelete(&geobuf);
 	esShaderUnload(&shad);

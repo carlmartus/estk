@@ -6,10 +6,7 @@
 int
 main(int argc, char **argv)
 {
-	SDL_Init(SDL_INIT_VIDEO);
-	SDL_SetVideoMode(400, 300, 0, SDL_OPENGL);
-
-	glewInit();
+	esGameInit(400, 300);
 
 	esTexture tex;
 	if (esTextureLoad(&tex, "demores/img.png", TEX_LINEAR, TEX_NONE)) {
@@ -62,7 +59,7 @@ main(int argc, char **argv)
 	esTextureUse(&tex);
 	esGeoRender(&geo, 3);
 
-	SDL_GL_SwapBuffers();
+	esGameGlSwap();
 
 	esTextureUnload(&tex);
 	esGeoBufDelete(&geobuf);

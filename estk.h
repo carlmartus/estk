@@ -8,6 +8,8 @@ enum esBool {
 };
 
 // Game loop
+void esGameInit(int screen_width, int screen_height);
+void esGameGlSwap();
 void esGameLoop(void (*frame)(float t), void (*exit)(), int frame_rate);
 void esGameLoopQuit();
 

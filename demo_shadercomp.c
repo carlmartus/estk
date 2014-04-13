@@ -6,10 +6,7 @@
 int
 main(int argc, char **argv)
 {
-	SDL_Init(SDL_INIT_VIDEO);
-	SDL_SetVideoMode(400, 300, 0, SDL_OPENGL);
-
-	glewInit();
+	esGameInit(400, 300);
 
 	esShader shad;
 	if (esShaderLoad(&shad, "demores/red_vert.shader", "demores/red_frag.shader")) {
