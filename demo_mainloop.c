@@ -13,6 +13,8 @@ frame(float time)
 {
 	static int frame_count = 0;
 
+	printf("Frame %3.3f\n", time);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	esShaderUse(&shad);
@@ -32,6 +34,15 @@ frame(float time)
 	SDL_GL_SwapBuffers();
 
 	if (++frame_count > 100) esGameLoopQuit();
+}
+
+static void
+loop_exit()
+{
+	printf("Good bye!\n");
+	esGeoBufDelete(&geobuf);
+	esShaderUnload(&shad);
+	SDL_Quit();
 }
 
 int
@@ -66,12 +77,7 @@ main(int argc, char **argv)
 
 	glClearColor(0.6, 0.5, 0.6, 1.0);
 
-	esGameLoop(frame, 0);
-
-	esGeoBufDelete(&geobuf);
-	esShaderUnload(&shad);
-
-	SDL_Quit();
+	esGameLoop(frame, loop_exit, 0);
 	return 0;
 }
 

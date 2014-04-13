@@ -38,35 +38,63 @@ _check_error(int line)
 static int loop_run;
 
 #ifdef EMSCRIPTEN
-static float emscripten_frame_time;
+static Uint32 emscripten_last_frame;
 static void (*emscripten_frame)(float t);
+static void (*emscripten_exit) ();
 
 static void
 emscripten_mainloop()
 {
+	if (!loop_run) {
+		emscripten_exit();
+		emscripten_cancel_main_loop();
+		return;
+	}
+
+	Uint32 current = SDL_GetTicks();
+	float pass = 0.001f * (float) (current - emscripten_last_frame);
+	emscripten_last_frame = current;
+
+	emscripten_frame(pass);
 }
 
 #endif
 
 void
-esGameLoop(void (*frame)(float t), int frame_rate)
+esGameLoop(void (*frame)(float t), void (*exit)(), int frame_rate)
 {
 	loop_run = 1;
 
 #ifdef EMSCRIPTEN
 	emscripten_frame = frame;
-	emscripten_frame_time = 1.0f / (float) frame_rate;
+	emscripten_exit = exit;
 
+	emscripten_last_frame = SDL_GetTicks();
 	emscripten_set_main_loop(emscripten_mainloop, frame_rate, 0);
 #else
 
 	if (frame_rate == 0) frame_rate = 60;
 	int loop_delay = 1000 / frame_rate;
 
-	while (loop_run) {
-		frame(0.1f);
-		SDL_Delay(loop_delay);
+	float pass = 0.1f;
+	Uint32 start = SDL_GetTicks();
+	while (1) {
+		frame(pass);
+		if (!loop_run) break;
+
+		Uint32 diff = SDL_GetTicks() - start;
+
+		if (diff < loop_delay) {
+			SDL_Delay(loop_delay - diff);
+			pass = (float) loop_delay * 0.001f;
+		} else {
+			pass = (float) diff * 0.001f;
+		}
+
+		start = SDL_GetTicks();
 	}
+
+	exit();
 #endif
 }
 
