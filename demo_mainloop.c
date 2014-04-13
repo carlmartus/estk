@@ -13,6 +13,8 @@ frame(float time)
 {
 	static int frame_count = 0;
 
+	printf("Frame %3.3f\n", time);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	esShaderUse(&shad);
@@ -37,9 +39,9 @@ frame(float time)
 static void
 loop_exit()
 {
+	printf("Good bye!\n");
 	esGeoBufDelete(&geobuf);
 	esShaderUnload(&shad);
-
 	SDL_Quit();
 }
 

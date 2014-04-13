@@ -8,7 +8,7 @@ enum esBool {
 };
 
 // Game loop
-void esGameLoop(void (*frame)(float t), void (*exit) (), int frame_rate);
+void esGameLoop(void (*frame)(float t), void (*exit)(), int frame_rate);
 void esGameLoopQuit();
 
 // Shader
