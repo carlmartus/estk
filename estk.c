@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <GL/glew.h>
@@ -37,6 +38,14 @@ _check_error(int line)
 // }}}
 // Game loop {{{
 
+#define MAX_KEYS 2000
+
+static int loop_run;
+static int key_regs = 0;
+static struct {
+	void (*callback) (int key, int down);
+} keys[MAX_KEYS];
+
 void
 esGameInit(int screen_width, int screen_height)
 {
@@ -46,13 +55,33 @@ esGameInit(int screen_width, int screen_height)
 	glewInit();
 }
 
+static void
+event_key(int sdlkey, int down)
+{
+	if (keys[sdlkey].callback) {
+		keys[sdlkey].callback(sdlkey, down);
+	}
+}
+
+static void
+events()
+{
+	SDL_Event event;
+	while (SDL_PollEvent(&event)) {
+		switch (event.type) {
+			case SDL_QUIT : loop_run = 0; break;
+
+			case SDL_KEYDOWN :	event_key(event.key.keysym.sym, 1); break;
+			case SDL_KEYUP :	event_key(event.key.keysym.sym, 0); break;
+		}
+	}
+}
+
 void
 esGameGlSwap()
 {
 	SDL_GL_SwapBuffers();
 }
-
-static int loop_run;
 
 #ifdef EMSCRIPTEN
 static Uint32 emscripten_last_frame;
@@ -72,6 +101,8 @@ emscripten_mainloop()
 	float pass = 0.001f * (float) (current - emscripten_last_frame);
 	emscripten_last_frame = current;
 
+	events();
+	if (!loop_run) return;
 	emscripten_frame(pass);
 }
 
@@ -96,6 +127,8 @@ esGameLoop(void (*frame)(float t), void (*exit)(), int frame_rate)
 	float pass = 0.1f;
 	Uint32 start = SDL_GetTicks();
 	while (1) {
+		events();
+		if (!loop_run) break;
 		frame(pass);
 		if (!loop_run) break;
 
@@ -119,6 +152,17 @@ void
 esGameLoopQuit()
 {
 	loop_run = 0;
+}
+
+void
+esGameRegisterKey(int sdlkey, void (*callback)(int key, int down))
+{
+	if (key_regs == 0) {
+		memset(keys, 0, sizeof(keys));
+	}
+	key_regs++;
+
+	keys[sdlkey].callback = callback;
 }
 
 // }}}

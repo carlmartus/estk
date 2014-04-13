@@ -12,6 +12,7 @@ void esGameInit(int screen_width, int screen_height);
 void esGameGlSwap();
 void esGameLoop(void (*frame)(float t), void (*exit)(), int frame_rate);
 void esGameLoopQuit();
+void esGameRegisterKey(int sdlkey, void (*callback)(int key, int down));
 
 // Shader
 typedef int esUniform;
