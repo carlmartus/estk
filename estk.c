@@ -64,7 +64,7 @@ event_key(int sdlkey, int down)
 }
 
 static void
-events()
+events(void)
 {
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
@@ -78,7 +78,7 @@ events()
 }
 
 void
-esGameGlSwap()
+esGameGlSwap(void)
 {
 	SDL_GL_SwapBuffers();
 }
@@ -89,7 +89,7 @@ static void (*emscripten_frame)(float t);
 static void (*emscripten_exit)();
 
 static void
-emscripten_mainloop()
+emscripten_mainloop(void)
 {
 	if (!loop_run) {
 		if (emscripten_exit) emscripten_exit();
@@ -149,7 +149,7 @@ esGameLoop(void (*frame)(float t), void (*exit)(), int frame_rate)
 }
 
 void
-esGameLoopQuit()
+esGameLoopQuit(void)
 {
 	loop_run = 0;
 }
