@@ -9,9 +9,9 @@ enum esBool {
 
 // Game loop
 void esGameInit(int screen_width, int screen_height);
-void esGameGlSwap();
+void esGameGlSwap(void);
 void esGameLoop(void (*frame)(float t), void (*exit)(), int frame_rate);
-void esGameLoopQuit();
+void esGameLoopQuit(void);
 void esGameRegisterKey(int sdlkey, void (*callback)(int key, int down));
 
 // Shader
