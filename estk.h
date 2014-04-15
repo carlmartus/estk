@@ -7,6 +7,10 @@ enum esBool {
 	ES_TRUE = 1,
 };
 
+// Misc
+void _esCheckGlError();
+#define esCheckGlError() _esCheckGlError(__FILE__, __LINE__)
+
 // Game loop
 void esGameInit(int screen_width, int screen_height);
 void esGameGlSwap(void);

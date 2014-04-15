@@ -15,11 +15,11 @@
 #include <SDL/SDL_image.h>
 
 static void
-_check_error(int line)
+_check_error(const char *file, int line)
 {
 	GLenum err = glGetError();
 	if (err != GL_NO_ERROR) {
-		printf("OpenGL Error (:%d): %d ", line, err);
+		printf("OpenGL Error (%s:%d): %d ", file, line, err);
 
 		switch (err) {
 #define ERR_CASE_PRINT(cond) case cond : printf("%s\n", #cond); break
@@ -33,7 +33,16 @@ _check_error(int line)
 		}
 	}
 }
-#define check_error() _check_error(__LINE__)
+#define check_error() _check_error(__FILE__, __LINE__)
+
+// }}}
+// Misc {{{
+void
+_esCheckGlError(const char *file, int line)
+{
+	_check_error(file, line);
+}
+
 
 // }}}
 // Game loop {{{
