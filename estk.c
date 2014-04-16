@@ -59,7 +59,7 @@ void
 esGameInit(int screen_width, int screen_height)
 {
 	SDL_Init(SDL_INIT_VIDEO);
-	SDL_SetVideoMode(400, 300, 0, SDL_OPENGL);
+	SDL_SetVideoMode(screen_width, screen_height, 0, SDL_OPENGL);
 
 	glewInit();
 }
