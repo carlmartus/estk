@@ -27,10 +27,12 @@ typedef struct {
 	esUniform uniforms[UNIFORMS_MAX];
 } esShader;
 
-int esShaderLoad(esShader *shader, const char *vert_file, const char *frag_file);
+int esShaderLoad(esShader *shader,
+		const char *vert_file, const char *frag_file);
 void esShaderUse(const esShader *shader);
 void esShaderUnload(esShader *shader);
-int esShaderUniformRegister(esShader *shader, esUniform reg, const char *name);
+int esShaderUniformRegister(esShader *shader,
+		esUniform reg, const char *name);
 int esShaderUniformGl(esShader *shader, esUniform reg);
 
 // Geometry buffer
@@ -72,8 +74,9 @@ typedef struct {
 } esGeo;
 
 void esGeoReset(esGeo *geo, int bufcount);
-void esGeoPoint(esGeo *geo, int id, esGeoBuf *geobuf, enum esGeoDataType datatype,
-		int elements, size_t offset, size_t stride, enum esBool normalized);
+void esGeoPoint(esGeo *geo, int id, esGeoBuf *geobuf,
+		enum esGeoDataType datatype, int elements,
+		size_t offset, size_t stride, enum esBool normalized);
 void esGeoRender(const esGeo *geo, int vertices);
 
 // Projection
@@ -99,6 +102,26 @@ int esTextureLoad(esTexture *tex, const char *file_name,
 		enum esTextureMipmap min, enum esTextureMipmap mag);
 void esTextureUse(esTexture *tex);
 void esTextureUnload(esTexture *tex);
+
+// Font
+typedef struct {
+	esTexture *texture;
+	esShader *shader;
+
+	int vert_count;
+	int buf_size, buf_alloc;
+	esGeoBuf geo_buf;
+	esGeo geo;
+	void *buf;
+} esFont;
+
+int esFontCreate(esFont *ft, esTexture *tex, esShader *shad,
+		int attrib_loc, int attrib_uv, int addition_attribs);
+void esFontDelete(esFont *ft);
+void esFontAddText(esFont *ft, float offset_x, float offset_y,
+		const char *fmt, ...);
+void esFontRender(esFont *ft);
+void esFontClearBuf(esFont *ft);
 
 #endif
 
