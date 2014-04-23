@@ -609,7 +609,7 @@ esTextureUnload(esTexture *tex)
 // Font {{{
 
 #define MAX_STRING 512
-#define FONT_INIT 2048
+#define FONT_INIT 4096
 
 struct font_vert {
 	float x, y;
@@ -620,11 +620,17 @@ int
 esFontCreate(esFont *ft, esTexture *tex, esShader *shad,
 		int attrib_loc, int attrib_uv, int addition_attribs)
 {
+	ft->texture = tex;
+	ft->shader = shad;
+
+	ft->vert_count = 0;
+
 	ft->buf = malloc(FONT_INIT*sizeof(struct font_vert)*6);
 	ft->buf_size = 0;
 	ft->buf_alloc = FONT_INIT;
 
 	esGeoBufCreate(&ft->geo_buf);
+
 	esGeoReset(&ft->geo, 2 + addition_attribs);
 	esGeoPoint(&ft->geo, 0, &ft->geo_buf, GEODATA_FLOAT, 2, 0,
 			sizeof(struct font_vert), ES_FALSE);
@@ -641,9 +647,10 @@ buf_check(esFont *ft, int add)
 	int required = ft->buf_size + add;
 
 	if (required < ft->buf_alloc) return;
-	printf("GROW %d\n", required);
 
-	ft->buf_alloc <<= 1;
+	while (ft->buf_alloc < required) {
+		ft->buf_alloc <<= 1;
+	}
 	ft->buf = realloc(ft->buf, ft->buf_alloc);
 }
 
@@ -693,6 +700,7 @@ esFontAddText(esFont *ft,
 		FONT_PUSH(0.0f, 1.0f, u0, v1);
 
 		ft->vert_count += 6;
+		offset_x += 1.0f;
 	}
 
 	ft->buf_size += size;
@@ -710,15 +718,21 @@ esFontDelete(esFont *ft)
 void
 esFontRender(esFont *ft)
 {
-	esGeoBufCopy(&ft->geo_buf, ft->buf, ft->buf_size, GEOBUF_STREAM);
-	esGeoRender(&ft->geo, ft->vert_count);
+	if (ft->shader) {
+		esShaderUse(ft->shader);
+	}
 
-	ft->vert_count = 0;
+	if (ft->vert_count > 0) {
+
+		esGeoBufCopy(&ft->geo_buf, ft->buf, ft->buf_size, GEOBUF_STREAM);
+		esGeoRender(&ft->geo, ft->vert_count);
+	}
 }
 
 void
 esFontClearBuf(esFont *ft)
 {
+	ft->vert_count = 0;
 }
 
 // }}}
