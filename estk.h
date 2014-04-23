@@ -129,7 +129,8 @@ typedef struct {
 	int gl_fb, gl_tex, gl_depth;
 } esFrameBuffer;
 
-int esFrameBufferCreate(esFrameBuffer *fb, int dimension);
+int esFrameBufferCreate(esFrameBuffer *fb, int dimension,
+		enum esTextureMipmap min, enum esTextureMipmap mag);
 void esFrameBufferDelete(esFrameBuffer *fb);
 void esFrameBufferSet(esFrameBuffer *fb);
 void esFrameBufferUnSet(void);

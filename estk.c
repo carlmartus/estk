@@ -17,6 +17,12 @@
 
 static int window_w, window_h;
 
+
+static const GLenum mipmap_map[] = {
+	[TEX_NONE] = GL_NEAREST,
+	[TEX_LINEAR] = GL_LINEAR,
+};
+
 static void
 _check_error(const char *file, int line)
 {
@@ -585,13 +591,8 @@ esTextureLoad(esTexture *tex, const char *file_name,
 	glTexImage2D(GL_TEXTURE_2D, 0, mode, surf->w, surf->h,
 			0, mode, GL_UNSIGNED_BYTE, surf->pixels);
 
-	static const GLenum map[] = {
-		[TEX_NONE] = GL_NEAREST,
-		[TEX_LINEAR] = GL_LINEAR,
-	};
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, map[min]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, map[mag]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmap_map[min]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mipmap_map[mag]);
 
 	SDL_FreeSurface(surf);
 	return 0;
@@ -744,7 +745,8 @@ esFontClearBuf(esFont *ft)
 // Framebuffer {{{
 
 int
-esFrameBufferCreate(esFrameBuffer *fb, int dimension)
+esFrameBufferCreate(esFrameBuffer *fb, int dimension,
+		enum esTextureMipmap min, enum esTextureMipmap mag)
 {
 	GLuint glfb, gltex, gldepth;
 	glGenFramebuffers(1, &glfb);
@@ -759,8 +761,8 @@ esFrameBufferCreate(esFrameBuffer *fb, int dimension)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, dimension, dimension,
 			0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mipmap_map[min]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmap_map[mag]);
 	check_error();
 
 	// Depth buffer
