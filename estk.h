@@ -123,5 +123,17 @@ void esFontAddText(esFont *ft, float offset_x, float offset_y,
 void esFontRender(esFont *ft);
 void esFontClearBuf(esFont *ft);
 
+// Framebuffer
+typedef struct {
+	int dimension;
+	int gl_fb, gl_tex, gl_depth;
+} esFrameBuffer;
+
+int esFrameBufferCreate(esFrameBuffer *fb, int dimension);
+void esFrameBufferDelete(esFrameBuffer *fb);
+void esFrameBufferSet(esFrameBuffer *fb);
+void esFrameBufferUnSet(void);
+void esFrameBufferBind(esFrameBuffer *fb);
+
 #endif
 

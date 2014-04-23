@@ -15,6 +15,8 @@
 
 #include <SDL/SDL_image.h>
 
+static int window_w, window_h;
+
 static void
 _check_error(const char *file, int line)
 {
@@ -59,6 +61,9 @@ static struct {
 void
 esGameInit(int screen_width, int screen_height)
 {
+	window_w = screen_width;
+	window_h = screen_height;
+
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_SetVideoMode(screen_width, screen_height, 0, SDL_OPENGL);
 
@@ -733,6 +738,88 @@ void
 esFontClearBuf(esFont *ft)
 {
 	ft->vert_count = 0;
+}
+
+// }}}
+// Framebuffer {{{
+
+int
+esFrameBufferCreate(esFrameBuffer *fb, int dimension)
+{
+	GLuint glfb, gltex, gldepth;
+	glGenFramebuffers(1, &glfb);
+	glGenTextures(1, &gltex);
+
+	fb->dimension = dimension;
+	fb->gl_fb = glfb;
+	fb->gl_tex = gltex;
+
+	// Texture
+	glBindTexture(GL_TEXTURE_2D, fb->gl_tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, dimension, dimension,
+			0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	check_error();
+
+	// Depth buffer
+	glGenRenderbuffers(1, &gldepth);
+	glBindRenderbuffer(GL_RENDERBUFFER, gldepth);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16,
+			dimension, dimension);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	check_error();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, fb->gl_fb);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER,
+			GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, gldepth);
+	check_error();
+	fb->gl_depth = gldepth;
+
+	// Color channel
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+			GL_TEXTURE_2D, gltex, 0);
+	GLenum gldraws[1] = {GL_COLOR_ATTACHMENT0};
+	glDrawBuffers(1, gldraws);
+	check_error();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	return 0;
+}
+
+void
+esFrameBufferDelete(esFrameBuffer *fb)
+{
+	GLuint glfb, gltex, gldepth;
+	glfb = fb->gl_fb;
+	gltex = fb->gl_tex;
+	gldepth = fb->gl_depth;
+
+	glDeleteFramebuffers(1, &glfb);
+	glDeleteTextures(1, &gltex);
+	glDeleteRenderbuffers(1, &gldepth);
+}
+
+void
+esFrameBufferSet(esFrameBuffer *fb)
+{
+	glViewport(0, 0, fb->dimension, fb->dimension);
+	glBindFramebuffer(GL_FRAMEBUFFER, fb->gl_fb);
+}
+
+void
+esFrameBufferUnSet(void)
+{
+	glViewport(0, 0, window_w, window_h);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void
+esFrameBufferBind(esFrameBuffer *fb)
+{
+	glBindTexture(GL_TEXTURE_2D, fb->gl_tex);
 }
 
 // }}}
