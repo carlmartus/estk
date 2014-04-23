@@ -75,29 +75,26 @@ main(int argc, char **argv)
 
 	esGeo texgeo;
 	esGeoReset(&texgeo, 3);
-	esGeoPoint(&texgeo, 0, &geobuf, GEODATA_FLOAT, 2,  0, sizeof(struct data), ES_FALSE);
-	esGeoPoint(&texgeo, 1, &geobuf, GEODATA_FLOAT, 2,  8, sizeof(struct data), ES_TRUE);
-	esGeoPoint(&texgeo, 2, &geobuf, GEODATA_UBYTE, 4, 16, sizeof(struct data), ES_TRUE);
+	esGeoPoint(&texgeo, 0, &geobuf, GEODATA_FLOAT, 2,  0,
+			sizeof(struct data), ES_FALSE);
+	esGeoPoint(&texgeo, 1, &geobuf, GEODATA_FLOAT, 2,  8,
+			sizeof(struct data), ES_TRUE);
+	esGeoPoint(&texgeo, 2, &geobuf, GEODATA_UBYTE, 4, 16,
+			sizeof(struct data), ES_TRUE);
 
 	// Render to texture
-
 	esFrameBufferSet(&fb);
 	glClearColor(0.6, 0.5, 0.6, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	esShaderUse(&shad_red);
 	esGeoRender(&cube, 6);
-
-	// Render geometry
-	esTexture t1;
-	esTextureLoad(&t1, "demores/img.png", TEX_LINEAR, TEX_LINEAR);
-	esTextureUse(&t1);
-
 	esFrameBufferUnSet();
 
+	// Render geometry
 	esFrameBufferBind(&fb);
 	esShaderUse(&shad_tex);
-	esGeoRender(&texgeo, 12);
+	esGeoRender(&texgeo, 6);
 
 	esGameGlSwap();
 	esFrameBufferDelete(&fb);

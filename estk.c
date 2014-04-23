@@ -780,8 +780,6 @@ esFrameBufferCreate(esFrameBuffer *fb, int dimension)
 	// Color channel
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 			GL_TEXTURE_2D, gltex, 0);
-	GLenum gldraws[1] = {GL_COLOR_ATTACHMENT0};
-	glDrawBuffers(1, gldraws);
 	check_error();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
