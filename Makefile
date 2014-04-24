@@ -1,4 +1,4 @@
-LDFLAGS=-lSDL -lGL -lGLEW -lm -lSDL_image
+LDFLAGS=-lSDL -lGL -lGLEW -lm -lSDL_image -lSDL_mixer
 EMCC=/opt/emscripten/emcc
 DDIR=demos
 DEMOS=$(wildcard $(DDIR)/*.c)

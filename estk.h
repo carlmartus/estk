@@ -1,6 +1,7 @@
 #ifndef ESTK_H
 #define ESTK_H
 #include <stdlib.h>
+#include <SDL/SDL_mixer.h>
 
 enum esBool {
 	ES_FALSE = 0,
@@ -135,6 +136,15 @@ void esFrameBufferDelete(esFrameBuffer *fb);
 void esFrameBufferSet(esFrameBuffer *fb);
 void esFrameBufferUnSet(void);
 void esFrameBufferBind(esFrameBuffer *fb);
+
+// Audio
+typedef struct {
+	Mix_Chunk *chunk;
+} esSound;
+
+int esSoundLoad(esSound *sn, const char *file_name);
+void esSoundUnLoad(esSound *sn);
+void esSoundPlay(esSound *sn);
 
 #endif
 

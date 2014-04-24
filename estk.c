@@ -70,8 +70,12 @@ esGameInit(int screen_width, int screen_height)
 	window_w = screen_width;
 	window_h = screen_height;
 
-	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 	SDL_SetVideoMode(screen_width, screen_height, 0, SDL_OPENGL);
+
+	if(Mix_OpenAudio(22050, AUDIO_S16, 1, 4096)) {
+		printf("Cannot open audio\n");
+	}
 
 	glewInit();
 }
@@ -820,6 +824,29 @@ void
 esFrameBufferBind(esFrameBuffer *fb)
 {
 	glBindTexture(GL_TEXTURE_2D, fb->gl_tex);
+}
+
+// }}}
+// Sound {{{
+
+int
+esSoundLoad(esSound *sn, const char *file_name)
+{
+	sn->chunk = Mix_LoadWAV(file_name);
+	return sn->chunk == 0;
+}
+
+void
+esSoundUnLoad(esSound *sn)
+{
+	Mix_FreeChunk(sn->chunk);
+	sn->chunk = NULL;
+}
+
+void
+esSoundPlay(esSound *sn)
+{
+	Mix_PlayChannel(-1, sn->chunk, -1);
 }
 
 // }}}
