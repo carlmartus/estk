@@ -146,5 +146,14 @@ int esSoundLoad(esSound *sn, const char *file_name);
 void esSoundUnLoad(esSound *sn);
 void esSoundPlay(esSound *sn);
 
+typedef struct {
+	Mix_Music *music;
+} esMusic;
+
+int esMusicLoad(esMusic *mu, const char *file_name);
+void esMusicUnLoad(esMusic *mu);
+void esMusicPlay(esMusic *mu);
+void esMusicHalt(void);
+
 #endif
 

@@ -73,7 +73,7 @@ esGameInit(int screen_width, int screen_height)
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 	SDL_SetVideoMode(screen_width, screen_height, 0, SDL_OPENGL);
 
-	if(Mix_OpenAudio(22050, AUDIO_S16, 1, 4096)) {
+	if (Mix_OpenAudio(22050, AUDIO_S16, 1, 4096)) {
 		printf("Cannot open audio\n");
 	}
 
@@ -117,6 +117,7 @@ static void
 emscripten_mainloop(void)
 {
 	if (!loop_run) {
+		esMusicHalt();
 		if (emscripten_exit) emscripten_exit();
 		emscripten_cancel_main_loop();
 		return;
@@ -169,6 +170,7 @@ esGameLoop(void (*frame)(float t), void (*exit)(), int frame_rate)
 		start = SDL_GetTicks();
 	}
 
+	esMusicHalt();
 	if (exit) exit();
 #endif
 }
@@ -846,7 +848,33 @@ esSoundUnLoad(esSound *sn)
 void
 esSoundPlay(esSound *sn)
 {
-	Mix_PlayChannel(-1, sn->chunk, -1);
+	Mix_PlayChannel(-1, sn->chunk, 0);
+}
+
+int
+esMusicLoad(esMusic *mu, const char *file_name)
+{
+	mu->music = Mix_LoadMUS(file_name);
+	return mu->music == 0;
+}
+
+void
+esMusicUnLoad(esMusic *mu)
+{
+	Mix_FreeMusic(mu->music);
+	mu->music = NULL;
+}
+
+void
+esMusicPlay(esMusic *mu)
+{
+	Mix_PlayMusic(mu->music, -1);
+}
+
+void
+esMusicHalt(void)
+{
+	Mix_HaltMusic();
 }
 
 // }}}

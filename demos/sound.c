@@ -5,12 +5,13 @@
 #include "estk.h"
 
 static esSound sfx;
+static esMusic mus;
 
 static void
 frame(float time)
 {
 	static int frame_count = 0;
-	if (++frame_count > 100) esGameLoopQuit();
+	if (++frame_count > 300) esGameLoopQuit();
 }
 
 static void
@@ -31,6 +32,15 @@ main(int argc, char **argv)
 		return 1;
 	}
 
+	if (esMusicLoad(&mus, "demores/music.ogg")) {
+		printf("Cannot load music file\n");
+		return 1;
+	}
+
+	printf("Play music\n");
+	esMusicPlay(&mus);
+
+	printf("Play sound\n");
 	esSoundPlay(&sfx);
 
 	esGameLoop(frame, loop_exit, 0);
