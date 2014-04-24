@@ -22,6 +22,18 @@ Features
  * Projection matrix generators
  * Texture file loading
 
+Demos screenshots
+-----------------
+![Shader attributes](screenshots/demo_attr.png)
+![Camera 3D projection](screenshots/demo_cam.png)
+![Framebuffer texture](screenshots/demo_fb.png)
+![Bitmap font](screenshots/demo_font.png)
+![Image file to texture](screenshots/demo_image.png)
+![Main loop control](screenshots/demo_mainloop.png)
+![Draw a red triangle](screenshots/demo_red.png)
+![Shader with buffer data stride](screenshots/demo_stride.png)
+![Shader uniform constants](screenshots/demo_uniform.png)
+
 Documentation
 -------------
 API reference manual: [This link](API.md)
