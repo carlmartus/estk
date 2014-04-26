@@ -111,7 +111,7 @@ esGameGlSwap(void)
 #ifdef EMSCRIPTEN
 static Uint32 emscripten_last_frame;
 static void (*emscripten_frame)(float t);
-static void (*emscripten_exit)();
+static void (*emscripten_exit)(void);
 
 static void
 emscripten_mainloop(void)

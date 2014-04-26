@@ -15,7 +15,7 @@ void _esCheckGlError();
 // Game loop
 void esGameInit(int screen_width, int screen_height);
 void esGameGlSwap(void);
-void esGameLoop(void (*frame)(float t), void (*exit)(), int frame_rate);
+void esGameLoop(void (*frame)(float t), void (*exit)(void), int frame_rate);
 void esGameLoopQuit(void);
 void esGameRegisterKey(int sdlkey, void (*callback)(int key, int down));
 
